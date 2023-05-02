@@ -15,7 +15,7 @@ const Home = () => {
             </div>
 
             <div className="Button">
-                <Link to="/order">Order Now!</Link>
+                <Link to="/pizza" id="order-pizza">Order Now!</Link>
             </div>
         </>
     );

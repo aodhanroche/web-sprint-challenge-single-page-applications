@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import * as yup from "yup";
 
 
 const Order = () => {
 
-    const initalOrderValues = {name: "", dough: "", cheese: "", topping1: "", topping2: "", topping3: "", topping4: "", topping5: ""};
+    const initalOrderValues = {name: "", size: "", cheese: "", pepperoni: false, sausage: false, bacon: false, greenPeppers: false, onions: false,  specialInstructions: ""};
     const [order, setOrder] = useState(initalOrderValues);
 
 
     const handleChange = event => {
-        const { name, value } = event.target;
-        setOrder({ ...order, [name]: value });
+        const { name, value, type, checked } = event.target;
+        const updatedInfo = type === 'checkbox' ? checked : value;
+        setOrder({ ...order, [name]: updatedInfo });
     };
     
     const handleSubmit = event => {
@@ -18,6 +20,23 @@ const Order = () => {
         console.log(order);
         
     };
+
+    const formSchema = yup.object().shape({
+        name: yup.string().min("Name must be two characters long"),
+    });
+
+    const [ errors, setErrors ] = useState({
+        name: ""
+    });
+    
+    useEffect(() => {
+        formSchema.isValid(order).then(valid => {
+            setErrors({
+                ...errors,
+                name: valid,
+            });
+        });
+    }, [order]);
 
 
 
@@ -27,21 +46,21 @@ const Order = () => {
             <p>Place your order here!</p>
 
             <div>
-                <form onSubmit={event => handleSubmit(event)}>
+                <form id="pizza-form" onSubmit={event => handleSubmit(event)}>
                     <div>
                         <label>Name:
-                            <input value={order.name} name="name" placeholder="Name" onChange={event => handleChange(event)} />
+                            <input type="text" name="name" placeholder="Name" onChange={event => handleChange(event)} id="name-input"/>
                         </label>
                     </div>
 
                     <div>
-                        <label> Select Your Dough:
-                            <select value={order.dough} name="dough" onChange={event => handleChange(event)}>
-                                <option value={null}>Select a dough</option>
-                                <option value="Thick">Thick</option>
-                                <option value="Regular">Regular</option>
-                                <option value="Thin">Thin</option>
-                                <option value="Gluten Free">Gluten Free</option>
+                        <label> Select Your Size:
+                            <select value={order.size} name="size" onChange={event => handleChange(event)} id="size-dropdown">
+                                <option value={null}>Select a Size</option>
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                                <option value="Huge">Huge</option>
                             </select>
                         </label>
                     </div>
@@ -59,39 +78,38 @@ const Order = () => {
                     </div>
 
                     <div>
-                        <label> Select Your First Topping:
-                            <select value={order.topping1} name="topping1" onChange={event => handleChange(event)}>
-                                <option value={null}>Select a topping</option>
-                                <option value="Pepperoni">Pepperoni</option>
-                                <option value="Sausage">Sausage</option>
-                                <option value="Bacon">Bacon</option>
-                                <option value="No Meat">No Meat</option>
-                            </select>
+                        <label> Select Three Toppings:
+                            <div>
+                                <label>Pepperoni
+                                    <input type="checkbox" name="pepperoni" checked={order.pepperoni} onChange={handleChange}/>
+                                </label>
+                            </div>
+                            <div>
+                                <label>Sausage
+                                    <input type="checkbox" name="sausage" checked={order.sausage} onChange={handleChange}/>
+                                </label>
+                            </div>
+                            <div>
+                                <label>Bacon
+                                    <input type="checkbox" name="bacon" checked={order.bacon} onChange={handleChange}/>
+                                </label>
+                            </div>
+                            <div>
+                                <label>Green Peppers
+                                    <input type="checkbox" name="greenPeppers" checked={order.greenPeppers} onChange={handleChange}/>
+                                </label>
+                            </div>
+                            <div>
+                                <label>Onions
+                                    <input type="checkbox" name="onions" checked={order.onions} onChange={handleChange}/>
+                                </label>
+                            </div>
                         </label>
                     </div>
 
                     <div>
-                        <label> Select Your Second Topping:
-                            <select value={order.topping2} name="topping2" onChange={event => handleChange(event)}>
-                                <option value={null}>Select a topping</option>
-                                <option value='Green Peppers'>Green Peppers</option>
-                                <option value='Onions'>Onions</option>
-                                <option value='Olives'>Olives</option>
-                                <option value='No Veggies'>No Veggies</option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div>
-                        <label> Select Your Third Topping:
-                            <select value={order.topping3} name="topping3" onChange={event => handleChange(event)}>
-                                <option value={null}>Select a topping</option>
-                                <option value='Pineapple'>Pineapple</option>
-                                <option value='Tomatoes'>Tomatoes</option>
-                                <option value='Spinach'>Spinach</option>
-                                <option value='Jalapenos'>Jalapenos</option>
-                                <option value='No Additional'>No Additional</option>
-                            </select>
+                        <label>Special Instructions:
+                            <input type="text" name="specialInstructions" placeholder="Something" onChange={event => handleChange(event)} id="special-text" />
                         </label>
                     </div>
 
@@ -102,18 +120,21 @@ const Order = () => {
             </div>
 
             <div>
-                <h2>Order Corfimation</h2>
+                <h2>Order Confirmation</h2>
                 <p>Pizza For {order.name}</p>
                 <p>- {order.dough} </p>
                 <p>- {order.cheese}</p>
                 <p>Toppings: </p>
-                <p>- {order.topping1}</p>
-                <p>- {order.topping2}</p> 
-                <p>- {order.topping3}</p>
+                <p>- {order.pepperoni}</p>
+                <p>- {order.sausage}</p> 
+                <p>- {order.bacon}</p>
+                <p>- {order.greenPeppers}</p>
+                <p>- {order.sausage}</p>
+                <p>Special Instructions: {order.specialInstructions}</p>
             </div>
 
             <div>
-                <Link to='/confirmation'>Confirm Order</Link>
+                <Link to='/confirmation' id="order-button">Add To Order</Link>
             </div>
             
             <div>
