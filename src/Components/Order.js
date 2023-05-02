@@ -49,6 +49,7 @@ const Order = () => {
                 <form id="pizza-form" onSubmit={event => handleSubmit(event)}>
                     <div>
                         <label>Name:
+                            <p>name must be at least 2 characters</p>
                             <input type="text" name="name" placeholder="Name" onChange={event => handleChange(event)} id="name-input"/>
                         </label>
                     </div>
